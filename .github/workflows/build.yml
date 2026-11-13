@@ -1,0 +1,62 @@
+name: Build iOS Showcase App
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Ensure Dear ImGui is Present
+        run: |
+          if [ ! -f "vendor/imgui/imgui.h" ]; then
+            echo "Fetching Dear ImGui..."
+            git clone --depth 1 https://github.com/ocornut/imgui.git vendor/imgui
+          fi
+
+      - name: Setup CMake & Generator
+        run: |
+          cmake -B build -G Xcode \
+            -DCMAKE_SYSTEM_NAME=iOS \
+            -DCMAKE_OSX_SYSROOT=iphoneos \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0
+
+      - name: Build with Xcodebuild (Device arm64)
+        run: |
+          xcodebuild -project build/ZeninShowcase.xcodeproj \
+            -scheme ZeninShowcase \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            clean build
+
+      - name: Package Unsigned IPA
+        run: |
+          mkdir -p package/Payload
+          APP_PATH=$(find build/Release-iphoneos -name "*.app" -type d | head -n 1)
+          echo "Found app at: $APP_PATH"
+          cp -r "$APP_PATH" package/Payload/
+          cd package
+          zip -r ../ZeninShowcase.ipa Payload
+          cd ..
+          ls -lh ZeninShowcase.ipa
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZeninShowcase-iOS-IPA
+          path: ZeninShowcase.ipa
+          if-no-files-found: error
