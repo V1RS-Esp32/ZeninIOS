@@ -4,6 +4,32 @@
 
 namespace Zenin {
 
+// -------------------------------------------------------------
+// Rarity Grades matching CS2 / Standoff 2
+// -------------------------------------------------------------
+enum class ItemRarity {
+    Covert,     // Red (#eb4b4b)
+    Classified, // Pink (#d32ce6)
+    Restricted, // Purple (#8847ff)
+    MilSpec,    // Blue (#4b69ff)
+    Extraordinary // Gold (#ffd700) for Knives & Gloves
+};
+
+struct SkinItem {
+    std::string category;
+    std::string weaponName;
+    std::string skinName;
+    ItemRarity rarity;
+    int skinId;
+    float wear;
+    int seed;
+    bool statTrack;
+    int statTrackCount;
+    std::string charmName;
+    int stickerIds[4];
+    float stickerWear[4];
+};
+
 struct AimbotConfig {
     bool enabled = false;
     bool silentAim = false;
@@ -20,6 +46,7 @@ struct AimbotConfig {
     bool rcsEnabled = true;
     float rcsPitch = 1.0f;
     float rcsYaw = 1.0f;
+    int hitGroup = 0; // 0: All, 1: Upper Body, 2: Head Only
 };
 
 struct VisualsConfig {
@@ -28,7 +55,7 @@ struct VisualsConfig {
     
     // ESP
     bool boxEsp = true;
-    int boxType = 0; // 0: 2D Full, 1: 2D Corner, 2: 3D Box
+    int boxType = 1; // 0: 2D Full, 1: 2D Cornered, 2: 3D Box
     bool skeleton = true;
     bool healthBar = true;
     bool armorBar = true;
@@ -37,6 +64,7 @@ struct VisualsConfig {
     bool playerNames = true;
     bool snaplines = false;
     bool headDot = true;
+    float boxThickness = 1.5f;
 
     // Colors
     float boxColor[4] = { 0.45f, 0.45f, 1.00f, 1.00f };
@@ -78,23 +106,14 @@ struct WorldFxConfig {
     float skyboxColor[4] = { 0.08f, 0.09f, 0.14f, 1.00f };
 };
 
-struct SkinItem {
-    std::string category;
-    std::string weaponName;
-    std::string skinName;
-    int skinId;
-    float wear;
-    int seed;
-    bool statTrack;
-    int statTrackCount;
-    std::string charmName;
-    int stickerIds[4];
-};
-
 struct SkinchangerConfig {
     bool enabled = true;
-    int selectedCategory = 0; // 0: Knives, 1: Gloves, 2: Rifles, 3: Pistols, 4: Snipers, 5: Heavy
+    int selectedCategory = 0; // 0: Knives, 1: Gloves, 2: Rifles, 3: Snipers, 4: Pistols
     int selectedIndex = 0;
+    char searchFilter[64] = "";
+    float modelRotX = 0.3f;
+    float modelRotY = 0.8f;
+    bool autoRotate = true;
     std::vector<SkinItem> knifeCatalog;
     std::vector<SkinItem> weaponCatalog;
 };
@@ -106,10 +125,10 @@ struct MiscConfig {
     bool watermarkPing = true;
     bool watermarkTime = true;
     bool watermarkVersion = true;
-    float watermarkAlpha = 0.90f;
+    float watermarkAlpha = 0.92f;
     
     bool pingSpoof = false;
-    int pingSpoofValue = 12;
+    int pingSpoofValue = 14;
     bool jumpCircle = true;
     bool hitMarker = true;
     int hitMarkerSound = 1; // 0: Off, 1: Skeet, 2: Rust, 3: Bell
