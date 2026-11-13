@@ -186,7 +186,7 @@ static ImVec2 Project3D(const Vec3D& v, const ImVec2& center, float scale, float
     float z1 = -v.x * sinY + v.z * cosY;
 
     // Rotate X (Pitch)
-    float cosX = cosf(rotX), sinX = sinX = sinf(rotX);
+    float cosX = cosf(rotX), sinX = sinf(rotX);
     float y2 = v.y * cosX - z1 * sinX;
     float z2 = v.y * sinX + z1 * cosX;
 
@@ -227,7 +227,7 @@ static void DrawSkinInspectCard(SkinItem& item, const ImVec2& size, float& rotX,
     for (float x = p0.x + 25; x < p1.x; x += 30)
         drawList->AddLine(ImVec2(x, p0.y + 4), ImVec2(x, p1.y - 4), IM_COL32(255, 255, 255, 4));
     for (float y = p0.y + 20; y < p1.y; y += 30)
-        drawList->AddLine(ImVec2(p0.x + 4, y), ImVec2(p1.x - 4), y, IM_COL32(255, 255, 255, 4));
+        drawList->AddLine(ImVec2(p0.x + 4, y), ImVec2(p1.x - 4, y), IM_COL32(255, 255, 255, 4));
 
     // ---------------------------------------------------------
     // 3D Knife / Weapon Mesh Model (Curved Karambit Geometry)
